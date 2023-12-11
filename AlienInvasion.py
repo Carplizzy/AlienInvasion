@@ -4,103 +4,194 @@ import random
 from PIL import Image, ImageTk
 
 
-class Hangman():
-    def __init__(self):
-        self.word=Hangman._gen_word_()
-        self.word_track=Hangman._word_track_(self.word)
+class AlienInvasion():
+    def __init__(self,word=None):
+        """
+        Attributes:
+            word: game word, determined randomly from preset words
+            word_track: 
+            guesses: how many guesses the user has left, initally 7, each incorrect guess counts as a guess
+            self.length: length of game word or number of letters in word
+            player_word: word progress of player, italizes to list of "___" (one for each letter in word) 
+        """
+        if word!=None:
+            self.word=word
+        else:
+            self.word=AlienInvasion._gen_word_()
         self.total_guesses=7
         self.guesses=self.total_guesses
+        self.word_track=self.__word_track__(self.word)
         self.player_word=["_"]*len(self.word)
         self.exit=False
         self.length=len(self.word)
+
     def _gen_word_():
+        """This method randomly selects a word from the list words.
+        Returns: 
+            word:any word is the list words
+        """
         words=["dog","cat","apple","pie","lime","ballon","cookie","lamp","pea","scarf","mittens","husky","python"]
         index=random.randrange(0,12)
         word=words[index]
         return word
-    def _word_track_(word):
+    
+    def __word_track__(self,word):
+        """This method initalizes the tracking method for the game.
+        Arguements: 
+            word: string of letters
+        Returns:
+            word_track: a dictionary with each letter of the alphabet as keys and the number of times each letter 
+                occurs in the word as the value associated with the key.
+        """
         word_track={"A":0,"B":0,"C":0,"D":0,"E":0,"F":0,"G":0,"H":0,"I":0,"J":0,"K":0,"L":0,"M":0,"N":0,"O":0,"P":0,"Q":0,"R":0,"S":0,"T":0,"U":0,"V":0,"W":0,"X":0,"Y":0,"Z":0}
         for letter in word:
             word_track[letter.upper()]+=1
         return word_track
+    
     def __guess_valid__(self, guess):
-        #Sees if guess is valid or not.
+        """This method checks if a guess is valid, a guess is valid if it has not been already guessed. If valid returns count, if it is not valid return "DNE"
+        Arguements:
+            guess: a single alphabetical string
+        Returns:
+            count: number of times that the guess appears in the game word
+            "DNE": string "DNE" used to reprea
+        """
         try:
             count=self.word_track[guess.upper()]
             self.word_track.pop(guess.upper())
             return count
         except KeyError:
             return "DNE"
-    def _update_pword_(self,guess):
+        
+    def __update_pword__(self,guess):
+        """This method updates player word based on a letter guess and returns the updates player word with any occurances of guess added.
+        Arguements:
+            guess: a single alphabetical string
+        Returns:
+            None: updates player word
+        """
         place=0
-        print("run p word")
         for letter in self.word:
-            print(letter, guess)
             if guess.upper()==letter.upper():
                 self.player_word[place]=letter
             place+=1
         return self.player_word
+    
     def _check_win_lose_(self):
+        """This method checks if the user has won or lost
+        Returns:
+            True: returns true if the user has won, player word=game word
+            False: returns false if the user lost, guesses=0
+            None: returns none if game should coninue, no win or lose
+        """
         current_word=""
-        print(self.player_word)
         for letter in self.player_word:
             current_word+=str(letter)
-        print(current_word,self.word)
         if current_word.upper()==self.word.upper():
             return True
         if self.guesses==0:
             return False
     
-    def _turn_(self,guess):
+    def __turn__(self,guess):
+        """This method checks if a guess is valid
+        Arguements:
+            guess: a single alphabetical string
+        Returns:
+            Self.guesses: if guess is valid but there are no occurances one guess is deducted
+            None: if guess is not a valid guess, no updates to self
+            count: if guess is valid, updates self.guesses and self.player_word
+        """
         count=self.__guess_valid__(guess)
-        if count==None:
-            return count
         if count==0:
             self.guesses-=1
         else:
-            self._update_pword_(guess)
-
+            self.__update_pword__(guess)
             return count
 
-class HangmanHard(Hangman):
-    def _gen_word_():
-        return super._gen_word()
-    def _word_track_(word):
+class AlienInvasionHard(AlienInvasion):
+    def __init__(self, word=None):
+        """This class manages hard mode for alien invasion where you must also guess the location.
+        Attributes:
+            word: game word, determined randomly from preset words
+            guesses: how many guesses the user has left, initally 7, each incorrect guess counts as a guess
+            self.length: length of game word or number of letters in word
+            player_word: word progress of player, italizes to list of "___" (one for each letter in word) 
+            word_track: a list of dictionarys (one for each letter in word). Each dictonary has each letter of the alphabet as the keys
+                and the number of times the letter occurs in the word as the associated value.
+            word_prog: a list of 0's the same length as the word
+
+        """
+        if word==None:
+            super().__init__(word=None)
+        else:
+            super().__init__(word)
+        self.word_track=self.__word_track__(self.word)
+        self.word_prog=[0]*self.length
+    def __word_track__(self, word):
+        """This method initalizes the tracking method for the gamemode hard.
+        Arguements:
+            word: string of letters
+        Returns:
+            word_track: a list of dictionarys (one for each letter in word). Each dictonary has each letter of the alphabet as the keys
+                and the number of times the letter occurs in the word as the associated value.
+        """
         word_track=[]
         for letter in word.upper():
             alphabet={"A":0,"B":0,"C":0,"D":0,"E":0,"F":0,"G":0,"H":0,"I":0,"J":0,"K":0,"L":0,"M":0,"N":0,"O":0,"P":0,"Q":0,"R":0,"S":0,"T":0,"U":0,"V":0,"W":0,"X":0,"Y":0,"Z":0}
             alphabet[letter]=1
             word_track+=[alphabet]
         return word_track
-    def _word_prog_(word):
-        word_prog=[]
-        wordlength=len(word)
-        for letter in range(wordlength):
-            word_prog+=[0]
-        return word_prog
-    def __init__(self):
-        super(HangmanHard,self).__init__()
-        self.word_track=HangmanHard._word_track_(self.word)
-        self.word_prog=HangmanHard._word_prog_(self.word)
-    def _guess_location_(self,location):
-        self.location=location
+    
+    def __guess_location__(self,location):
+        """This method takes location guesses.
+        Arguements:
+            location: any integer in the range of word length
+        """
+        if self.word_prog[location]==1:
+            self.location=None
+            return None
+        if self.word_prog[location]==0:
+            self.location=location
+            return location
+
     def __guess_valid__(self, guess):
+        """This method validates that a letter guess is valid depending on location guess. A guess is invalid if it has already been guessesed in that location.
+        Arguements:
+            guess: a single alphabetical string
+        Returns:
+            count: returns count=0 if the guess is valid but not correct, returns count=1 if the guess is valid and correct.
+            "DNE": returns "DNE" if guess is invalid
+            Self: updates word prog and player word
+        """
         location=self.location
         try:
             count=self.word_track[location][guess]
-            self.word_track[location].pop(guess.upper())
             if count==1:
                 self.player_word[location]=str(guess)
                 self.word_prog[location]=1
             return count
         except KeyError:
             return "DNE"
-    def _check_win_(self):
-        return super()._check_win_lose_()
-    def _update_pword_(self,guess):
-        print("run p word")
+        
+    def __update_pword__(self,guess):
+        """This method updates the player word depending on the guessed location and letter
+        Returns:
+            player_word: updated player word
+        """
         self.player_word[self.location]=guess.upper()
         return self.player_word
+    def _check_win_(self):
+        """This method checks if  
+        """
+        return super()._check_win_lose_()
+    def __turn__(self,guess):
+        count=self.__guess_valid__(guess)
+        if count=="DNE":
+            return count
+        count=super().__turn__(guess)
+        self.word_track[self.location].pop(guess.upper())
+        return count
+
 
 class window(tk.Tk):
 #Pages set up
@@ -241,7 +332,7 @@ class window(tk.Tk):
     def _switch_screen_(self,page):
         page.tkraise()
     def _start_game_(self):
-        newgame=Hangman()
+        newgame=AlienInvasion()
         self.game=newgame
         self._switch_img_(self.game.guesses)
         self.game_page_progress.forget()
@@ -277,18 +368,15 @@ class window(tk.Tk):
         buttonid.forget()
         reveal_label=Label(self.game_page,text="The word was: "+self.game.word.upper())
         reveal_label.pack()
-        print("pack finish")
         finish_button=Button(self.ltr_three,text="FINISH", command=lambda:self._finish_button_(finish_button,reveal_label),bg="gold")
         finish_button.pack(side="bottom")
     def _check_game_progress_(self):
         progress=self.game._check_win_lose_()
-        print("prog",progress)
         if progress==True:
             results_message="You won!"
             progress_message="\nWord:"+str(self._word_display_())
             self._results_control_(results_message)
             self._word_display_control_(progress_message)
-            print("pack finish")
             finish_button=Button(self.ltr_three,text="FINISH!", command=lambda:self._finish_button_(finish_button),bg="gold")
             finish_button.pack(side="bottom")
             self._switch_img_(8)
@@ -303,14 +391,13 @@ class window(tk.Tk):
     def _take_guess_(self,guess,button):
         if self.game.guesses==0:
             return
-        count=self.game._turn_(guess)
+        count=self.game.__turn__(guess)
         if count=="DNE":
             results_message="Invalid guess, try again!"
             self._results_control_(results_message)
             return
         if count==0 or count==None:
             count="is no "
-            print("cout",count)
             button.configure(bg="red")
         else:
             button.configure(bg="green")
@@ -318,7 +405,6 @@ class window(tk.Tk):
                 count="are "+str(count)+" "
             else:
                 count="is "+str(count)+" "
-            
         results_message="There "+str(count)+str(guess)+" in the word\nYou have "+str(self.game.guesses)+" guesses left."
         self._results_control_(results_message)
         self._switch_img_(self.game.guesses)
@@ -413,9 +499,8 @@ class inheritance(window):
         super()._start_game_()
     def _start_game_hard_(self):
         self.gamemode="hard"
-        self.game=HangmanHard()
+        self.game=AlienInvasionHard()
         self.buttons_invalid=[list()]*self.game.length
-        print(self.buttons_invalid)
         self.game.location=None
         for letter in range(self.game.length):
             self.word_buttons[letter].pack(side="left")
@@ -427,17 +512,15 @@ class inheritance(window):
             self.word_buttons[self.game.location].configure(bg="white")
             for button in self.buttons_invalid[self.game.location]:
                 button.configure(bg="white")
-        self.game.location=location
-        if self.game.word_prog[self.game.location]==1:
-            self.game.location=None
-            return
-        print(self.game.guesses,self.game._check_win_())
         if self.game.guesses==0 or self.game._check_win_()==True:
+            return
+        self.game.__guess_location__(location)
+        if self.game.location==None:
             return
         self.word_buttons[location].configure(bg="yellow")
         for button in self.buttons_invalid[location]:
             button.configure(bg="red")
-        self.game._guess_location_(location)
+        self.game.__guess_location__(location)
         self._results_control_hard_("Now choose a letter")
     def _word_display_control_hard_(self):
         message="Guesses remaining:"+str(self.game.guesses)+"\nWord:"
@@ -445,7 +528,6 @@ class inheritance(window):
         self.game_page_progress_hard=Label(self.progress_disp_frame_hard,text=message)
         self.game_page_progress_hard.pack(side="top")
     def _results_control_hard_(self,message):
-        print("run resu;lts control hard")
         self.game_page_results_hard.forget()
         self.game_page_results_hard=Label(self.results_disp,text=message)
         self.game_page_results_hard.pack(side="bottom")
@@ -466,8 +548,7 @@ class inheritance(window):
                 button_in.configure(bg="white")
             if self.game.guesses==0:
                 return
-            count=self.game._turn_(guess)
-            print("count",count)
+            count=self.game.__turn__(guess)
             if count==None:
                 self.word_buttons[self.game.location].configure(bg="white")
                 self.buttons_invalid[self.game.location]=self.buttons_invalid[self.game.location]+[button]
@@ -477,7 +558,6 @@ class inheritance(window):
                 self.word_buttons[self.game.location].configure(text=guess,bg="green")
             if count=="DNE":
                 message="Invalid Guess! Try again."
-            print(self.game.player_word)
             self._switch_img_hard_(self.game.guesses)
             self._word_display_control_hard_()
             if (self.game._check_win_lose_())==True:
@@ -488,11 +568,10 @@ class inheritance(window):
             if (self.game._check_win_lose_())==False:
                 reveal_word_button=Button(self.results_disp,text="View Results", command=lambda:self._reveal_word_button_hard_(reveal_word_button))
                 reveal_word_button.pack(side="right")
-                message="YOU LOSE"
+                message="YOU LOST!"
             self._results_control_hard_(message)
             if count!="DNE":
                 self.game.location=None
-            print(self.buttons_invalid)
     def _reveal_word_button_hard_(self, buttonid):
         buttonid.forget()
         location=0
