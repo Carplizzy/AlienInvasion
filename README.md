@@ -1,4 +1,4 @@
-# AlienInvasion
+# Alien Invasion
 To run this program you must have Pillow: Python Imaging Library dowloaded
 You must also have all associated images downloaded and in the same file as the code file.
 
