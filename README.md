@@ -1,7 +1,7 @@
 # Alien Invasion
 To run this program you must have Pillow: Python Imaging Library dowloaded
 You must also have all associated images downloaded and in the same file as the code file.
-Open the FOLDER with VSCode and run AlienInvasion_Game.py to begin.
+Open the FOLDER (AlienInvasion-main) with VSCode and run AlienInvasion_Game.py to begin.
 
 In easy mode click letter buttons to guess letters in word. 
 Users can also play this gamemode with friends, first one user inputs a word then a secound guesses it.
