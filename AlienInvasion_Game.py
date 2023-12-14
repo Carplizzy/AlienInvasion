@@ -693,6 +693,7 @@ class AlienInvasionAddOns(AlienInvasionHardGUI):
     def __finish_button__(self, *widgetid):
         """This method is called when the finish button if pressed. Same as parent but removes hint button.
         """
+        self.hints_button.forget()
         self.hints_label.forget()
         return super().__finish_button__(*widgetid)
     
